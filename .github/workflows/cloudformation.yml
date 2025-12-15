@@ -1,0 +1,31 @@
+name: CloudFormation CI
+
+on:
+  push:
+    paths:
+      - "infrastructure/cloudformation/**"
+  pull_request:
+    paths:
+      - "infrastructure/cloudformation/**"
+
+jobs:
+  cfn-lint-taskcat:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cfn-lint
+        run: pip install cfn-lint
+
+      - name: Run cfn-lint
+        working-directory: infrastructure/cloudformation/templates
+        run: cfn-lint *.yaml
+
+      - name: Install taskcat
+        run: pip install taskcat
+
+      - name: Run taskcat tests (dry-run)
+        working-directory: infrastructure/cloudformation/tests
+        run: taskcat test run --dry-run
+
+

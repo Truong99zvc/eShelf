@@ -23,3 +23,12 @@ router.put('/update-password', protect, updatePassword);
 
 export default router;
 
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,83 @@
+pipeline {
+    agent any
+
+    environment {
+        REGISTRY = "your-docker-registry.io/eshelf"
+        IMAGE_TAG = "latest"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Lint & Test') {
+            steps {
+                sh '''
+                  npm ci
+                  npm run lint --if-present
+                  npm test --if-present
+                '''
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            when {
+                expression { return env.SONARQUBE_ENABLED == 'true' }
+            }
+            steps {
+                echo 'Run SonarQube scanner here (placeholder)'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh '''
+                  docker build -t $REGISTRY/api-gateway:$IMAGE_TAG backend/api-gateway
+                  docker build -t $REGISTRY/auth-service:$IMAGE_TAG backend/services/auth-service
+                  docker build -t $REGISTRY/user-service:$IMAGE_TAG backend/services/user-service
+                  docker build -t $REGISTRY/book-service:$IMAGE_TAG backend/services/book-service
+                  docker build -t $REGISTRY/review-service:$IMAGE_TAG backend/services/review-service
+                  docker build -t $REGISTRY/engagement-service:$IMAGE_TAG backend/services/engagement-service
+                  docker build -t $REGISTRY/ml-service:$IMAGE_TAG backend/services/ml-service
+                '''
+            }
+        }
+
+        stage('Trivy Scan') {
+            when {
+                expression { return env.TRIVY_ENABLED == 'true' }
+            }
+            steps {
+                echo 'Run Trivy container image scan here (placeholder)'
+            }
+        }
+
+        stage('Push Images') {
+            when {
+                expression { return env.SKIP_PUSH != 'true' }
+            }
+            steps {
+                sh '''
+                  docker push $REGISTRY/api-gateway:$IMAGE_TAG
+                  docker push $REGISTRY/auth-service:$IMAGE_TAG
+                  docker push $REGISTRY/user-service:$IMAGE_TAG
+                  docker push $REGISTRY/book-service:$IMAGE_TAG
+                  docker push $REGISTRY/review-service:$IMAGE_TAG
+                  docker push $REGISTRY/engagement-service:$IMAGE_TAG
+                  docker push $REGISTRY/ml-service:$IMAGE_TAG
+                '''
+            }
+        }
+
+        stage('Deploy K8s') {
+            steps {
+                echo 'Apply Kubernetes manifests / Helm charts here (placeholder)'
+            }
+        }
+    }
+}
+
+

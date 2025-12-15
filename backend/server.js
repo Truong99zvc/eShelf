@@ -118,21 +118,35 @@ app.get('/api', (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = config.port;
+// ⚠️ Lưu ý:
+// Từ phiên bản microservices, port 5000 được dành cho API Gateway.
+// Monolith backend này giữ lại cho mục đích demo/so sánh, mặc định chạy ở port khác.
+const PORT = process.env.MONOLITH_PORT || 5001;
 
 app.listen(PORT, () => {
-  console.log(`
+  console.log(
+    `
 ╔═══════════════════════════════════════════════════╗
 ║                                                   ║
-║     📚 eShelf Backend Server                      ║
+║     📚 eShelf Monolith Backend Server             ║
 ║                                                   ║
 ║     Server running in ${config.nodeEnv} mode            ║
 ║     Port: ${PORT}                                    ║
 ║     API: http://localhost:${PORT}/api                  ║
 ║                                                   ║
 ╚═══════════════════════════════════════════════════╝
-  `);
+`
+  );
 });
 
 export default app;
+
+
+
+
+
+
+
+
+
 

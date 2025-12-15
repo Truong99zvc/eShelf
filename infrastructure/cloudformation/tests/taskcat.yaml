@@ -1,0 +1,12 @@
+project:
+  name: eshelf-cloudformation-tests
+  regions:
+    - us-east-1
+
+tests:
+  vpc:
+    template: ../templates/vpc-stack.yaml
+  ec2:
+    template: ../templates/ec2-stack.yaml
+
+
